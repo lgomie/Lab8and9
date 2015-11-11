@@ -1,3 +1,4 @@
+
 from flask import Flask, Response, render_template, request
 import json
 from subprocess import Popen, PIPE
@@ -13,7 +14,7 @@ def index():
 Available API endpoints:
 
 GET /containers                     List all containers
-GET /containers?state=running      List running containers (only)
+GET /containers?state=running       List running containers (only)
 GET /containers/<id>                Inspect a specific container
 GET /containers/<id>/logs           Dump specific container logs
 GET /images                         List all images
@@ -23,7 +24,7 @@ POST /images                        Create a new image
 POST /containers                    Create a new container
 
 PATCH /containers/<id>              Change a container's state
-PATCH /images/<id>                  Change a specific image's attributes
+https://www.facebook.com/BuzzFeedFood/videos/1152896498056908/PATCH /images/<id>                  Change a specific image's attributes
 
 DELETE /containers/<id>             Delete a specific container
 DELETE /containers                  Delete all containers (including running)
@@ -41,8 +42,11 @@ def containers_index():
     curl -s -X GET -H 'Accept: application/json' http://localhost:8080/containers?state=running | python -mjson.tool
 
     """
-
-    resp = ''
+    if request.args.get('state') == 'running':
+        output = docker('ps')
+    else:
+        output = docker('ps','-a')
+    resp = json.dumps(docker_ps_to_array(output))
     return Response(response=resp, mimetype="application/json")
 
 @app.route('/images', methods=['GET'])
@@ -50,30 +54,36 @@ def images_index():
     """
     List all images 
     
+    curl -s -X GET -H 'Accept: application/json' http://localhost:8080/images | python -mjson.tool
     Complete the code below generating a valid response. 
     """
-    
-    resp = ''
+    output = docker('images')
+
+    resp = output
     return Response(response=resp, mimetype="application/json")
 
 @app.route('/containers/<id>', methods=['GET'])
 def containers_show(id):
     """
     Inspect specific container
-
+    curl -s -X GET -H 'Accept: application/json' http://localhost:8080/containers/<id> | python -mjson.tool
     """
-
-    resp = ''
-
+    
+    output = docker('inspect', id)
+    resp = output
     return Response(response=resp, mimetype="application/json")
 
 @app.route('/containers/<id>/logs', methods=['GET'])
 def containers_log(id):
     """
     Dump specific container logs
+    
+    curl -s -X GET -H 'Accept: application/json' http://localhost:8080/containers/<id>/logs | python -mjson.tool
 
     """
-    resp = ''
+
+    output = docker('logs', id)
+    resp = json.dumps(docker_logs_to_object(id, output))
     return Response(response=resp, mimetype="application/json")
 
 
@@ -81,6 +91,8 @@ def containers_log(id):
 def images_remove(id):
     """
     Delete a specific image
+
+    curl -s -X DELETE -H 'Accept: application/json' http://localhost:8080/images/<id> | python -mjson.tool
     """
     docker ('rmi', id)
     resp = '{"id": "%s"}' % id
@@ -91,14 +103,18 @@ def containers_remove(id):
     """
     Delete a specific container - must be already stopped/killed
 
+    curl -s -X DELETE -H 'Accept: application/json' http://localhost:8080/containers/<id> | python -mjson.tool
     """
+
     resp = ''
     return Response(response=resp, mimetype="application/json")
 
 @app.route('/containers', methods=['DELETE'])
 def containers_remove_all():
     """
-    Force remove all containers - dangrous!
+    Force remove all containers - dangerous!
+
+    curl -s -X DELETE -H 'Accept: application/json' http://localhost:8080/containers/ | python -mjson.tool
 
     """
     resp = ''
@@ -108,6 +124,8 @@ def containers_remove_all():
 def images_remove_all():
     """
     Force remove all images - dangrous!
+
+    curl -s -X DELETE -H 'Accept: application/json' http://localhost:8080/images | python -mjson.tool
 
     """
  
