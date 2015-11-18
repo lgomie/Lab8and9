@@ -33,7 +33,7 @@ DELETE /images                      Delete all images
 
 """
 
-    //Done
+    #Done
 @app.route('/containers', methods=['GET'])
 def containers_index():
     """
@@ -45,12 +45,12 @@ def containers_index():
     if request.args.get('state') == 'running':
         output = docker('ps')
     else:
-        output = docker('ps','-a');
-    resp = json.dumps(docker_ps_to_array(output));
-    return Response(response=resp, mimetype="application/json");
+        output = docker('ps','-a')
+    resp = json.dumps(docker_ps_to_array(output))
+    return Response(response=resp, mimetype="application/json")
 
 
-    //Done
+    #Done
 @app.route('/images', methods=['GET'])
 def images_index():
     """
@@ -58,38 +58,38 @@ def images_index():
     curl -s -X GET -H 'Accept: application/json' http://localhost:8080/images
 
     """
-    output = docker('images');
-    resp = output;
-    return Response(response=resp, mimetype="application/json");
+    output = docker('images')
+    resp = output
+    return Response(response=resp, mimetype="application/json")
 
 
-    //Done
-  @app.route('/containers/<id>', methods=['GET'])
+    #Done
+@app.route('/containers/<id>', methods=['GET'])
 def containers_show(id):
     """
     Inspect specific container
     curl -s -X GET -H 'Accept: application/json' http://localhost:8080/containers/<id>
     """
 
-    output = docker('inspect', id);
-    resp = output;
-    return Response(response=resp, mimetype="application/json");
+    output = docker('inspect', id)
+    resp = output
+    return Response(response=resp, mimetype="application/json")
 
 
-    //Done
-  @app.route('/containers/<id>/logs', methods=['GET'])
+    #Done
+@app.route('/containers/<id>/logs', methods=['GET'])
 def containers_log(id):
     """
     Dump specific container logs
     curl -s -X GET -H 'Accept: application/json' http://localhost:8080/containers/<id>/logs
     """
 
-    output = docker('logs', id);
-    resp = json.dumps(docker_logs_to_object(id, output));
-    return Response(response=resp, mimetype="application/json");
+    output = docker('logs', id)
+    resp = json.dumps(docker_logs_to_object(id, output))
+    return Response(response=resp, mimetype="application/json")
 
 
-    //Done
+    #Done
 @app.route('/images/<id>', methods=['DELETE'])
 def images_remove(id):
     """
@@ -97,11 +97,11 @@ def images_remove(id):
     curl -s -X DELETE -H 'Accept: application/json' http://localhost:8080/images/<id>
 
     """
-    docker ('rmi', id);
-    resp = '{"id": "%s"}' % id;
-    return Response(response=resp, mimetype="application/json");
+    docker ('rmi', id)
+    resp = '{"id": "%s"}' % id
+    return Response(response=resp, mimetype="application/json")
 
-    //Done
+    #Done
 @app.route('/containers/<id>', methods=['DELETE'])
 def containers_remove(id):
     """
@@ -109,13 +109,13 @@ def containers_remove(id):
     curl -s -X DELETE -H 'Accept: application/json' http://localhost:8080/containers/<id>
     """
 
-    docker('stop', id);
-    docker('kill', id);
-    docker('rm', id);
-    resp = '{"id": "%s"}' % id;
-    return Response(response=resp, mimetype="application/json");
+    docker('stop', id)
+    docker('kill', id)
+    docker('rm', id)
+    resp = '{"id": "%s"}' % id
+    return Response(response=resp, mimetype="application/json")
 
-    //Done
+    #Done
 @app.route('/containers', methods=['DELETE'])
 def containers_remove_all():
     """
@@ -123,18 +123,18 @@ def containers_remove_all():
     curl -s -X DELETE -H 'Accept: application/json' http://localhost:8080/containers/
     """
 
-    containers = docker_ps_to_array(docker('ps','-a'));
-    output = {};
+    containers = docker_ps_to_array(docker('ps','-a'))
+    output = {}
 
     for i in containers:
-        docker('stop', id);
-        docker('kill', id);
-        docker('rm', id);
+        docker('stop', id)
+        docker('kill', id)
+        docker('rm', id)
 
-    resp = 'All containers have been deleted.';
-    return Response(response=resp, mimetype="application/json");
+    resp = 'All containers have been deleted.'
+    return Response(response=resp, mimetype="application/json")
 
-    //Done
+    #Done
 @app.route('/images', methods=['DELETE'])
 def images_remove_all():
     """
@@ -142,16 +142,17 @@ def images_remove_all():
     curl -s -X DELETE -H 'Accept: application/json' http://localhost:8080/images
     """
 
-    images = docker('images', -q);
+    images = docker('images', -q)
     images = images.split ('\n')
 
     for i in images:
-        docker ('rmi', id);
-        resp = '{"id": "%s"}' % id;
+        docker ('rmi', id)
+        resp = '{"id": "%s"}' % id
 
-    resp = 'All images have been deleted.';
+    resp = 'All images have been deleted.'
+    return Response(response=resp, mimetype="application/json")
 
-
+    #Done
 @app.route('/containers', methods=['POST'])
 def containers_create():
     """
@@ -161,12 +162,18 @@ def containers_create():
     curl -X POST -H 'Content-Type: application/json' http://localhost:8080/containers -d '{"image": "b14752a6590e"}'
     curl -X POST -H 'Content-Type: application/json' http://localhost:8080/containers -d '{"image": "b14752a6590e","publish":"8081:22"}'
     """
-    body = request.get_json(force=True);
-    image = body['image'];
-    args = ('run', '-d');
-    id = docker(*(args + (image,)))[0:12];
-    return Response(response='{"id": "%s"}' % id, mimetype="application/json");
+    body = request.get_json(force=True)
+    image = body['image']
+    args = ('run', '-d')
 
+	  if 'publish' in body:
+        pub = body['publish']
+        id = docker ('run', '-d', '-p', pub, image)
+    else:
+        id = docker ('run', '-d', image)
+    
+    id = id[0:12]
+    return Response(response='{"id": "%s"}' % id, mimetype="application/json")
 
 @app.route('/images', methods=['POST'])
 def images_create():
@@ -174,16 +181,16 @@ def images_create():
     Create image (from uploaded Dockerfile)
     curl -H 'Accept: application/json' -F file=@Dockerfile http://localhost:8080/images
     """
-    dockerfile = request.files['file'];
+    dockerfile = request.files['file']
 
 
 
 
-    output = docker('build', '-t');
-    resp = output;
-    return Response(response=resp, mimetype="application/json");
+    output = docker('build', '-t')
+    resp = output
+    return Response(response=resp, mimetype="application/json")
 
-    //Done
+    #Done
 @app.route('/containers/<id>', methods=['PATCH'])
 def containers_update(id):
     """
@@ -192,38 +199,38 @@ def containers_update(id):
     curl -X PATCH -H 'Content-Type: application/json' http://localhost:8080/containers/b6cd8ea512c8 -d '{"state": "stopped"}'
 
     """
-    body = request.get_json(force=True);
+    body = request.get_json(force=True)
 
     try:
-        state = body['state'];
+        state = body['state']
         if state == 'running':
-            docker('restart', id);
+            docker('restart', id)
         elif state == 'stopped':
-            docker('stop', id);
+            docker('stop', id)
     except:
-        pass;
+        pass
 
-    resp = '{"id": "%s"}' % id;
-    return Response(response=resp, mimetype="application/json");
+    resp = '{"id": "%s"}' % id
+    return Response(response=resp, mimetype="application/json")
 
-    //Done
+    #Done
 @app.route('/images/<id>', methods=['PATCH'])
 def images_update(id):
     """
     Update image attributes (support: name[:tag])  tag name should be lowercase only
     curl -s -X PATCH -H 'Content-Type: application/json' http://localhost:8080/images/7f2619ed1768 -d '{"tag": "test:1.0"}'
     """
-    body = request.get_json(force=True);
+    body = request.get_json(force=True)
     try:
-        name = body['tag'];
-        name = str(name.lower());
-        name.split(':');
-        docker ('tag', name[0], name[0]+':'+name[1]);
+        name = body['tag']
+        name = str(name.lower())
+        name.split(':')
+        docker ('tag', name[0], name[0]+':'+name[1])
     except:
-        pass;
+        pass
 
-    resp = "{'%s' : '%s'}" % (name[0],name[1]);
-    return Response(response=resp, mimetype="application/json");
+    resp = "{'%s' : '%s'}" % (name[0],name[1])
+    return Response(response=resp, mimetype="application/json")
 
 
 def docker(*args):
