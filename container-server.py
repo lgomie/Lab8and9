@@ -175,37 +175,54 @@ def images_create():
     curl -H 'Accept: application/json' -F file=@Dockerfile http://localhost:8080/images
     """
     dockerfile = request.files['file'];
+
+
+
+
     output = docker('build', '-t');
     resp = output;
     return Response(response=resp, mimetype="application/json");
 
-
+    //Done
 @app.route('/containers/<id>', methods=['PATCH'])
 def containers_update(id):
     """
     Update container attributes (support: state=running|stopped)
     curl -X PATCH -H 'Content-Type: application/json' http://localhost:8080/containers/b6cd8ea512c8 -d '{"state": "running"}'
     curl -X PATCH -H 'Content-Type: application/json' http://localhost:8080/containers/b6cd8ea512c8 -d '{"state": "stopped"}'
+
     """
     body = request.get_json(force=True);
+
     try:
         state = body['state'];
         if state == 'running':
             docker('restart', id);
+        elif state == 'stopped':
+            docker('stop', id);
     except:
         pass;
 
     resp = '{"id": "%s"}' % id;
     return Response(response=resp, mimetype="application/json");
 
-
+    //Done
 @app.route('/images/<id>', methods=['PATCH'])
 def images_update(id):
     """
     Update image attributes (support: name[:tag])  tag name should be lowercase only
     curl -s -X PATCH -H 'Content-Type: application/json' http://localhost:8080/images/7f2619ed1768 -d '{"tag": "test:1.0"}'
     """
-    resp = '';
+    body = request.get_json(force=True);
+    try:
+        name = body['tag'];
+        name = str(name.lower());
+        name.split(':');
+        docker ('tag', name[0], name[0]+':'+name[1]);
+    except:
+        pass;
+
+    resp = "{'%s' : '%s'}" % (name[0],name[1]);
     return Response(response=resp, mimetype="application/json");
 
 
