@@ -166,12 +166,12 @@ def containers_create():
     image = body['image']
     args = ('run', '-d')
 
-	  if 'publish' in body:
+    if 'publish' in body:
         pub = body['publish']
         id = docker ('run', '-d', '-p', pub, image)
     else:
         id = docker ('run', '-d', image)
-    
+
     id = id[0:12]
     return Response(response='{"id": "%s"}' % id, mimetype="application/json")
 
