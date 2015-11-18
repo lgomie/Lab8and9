@@ -62,9 +62,8 @@ def images_index():
     resp = output;
     return Response(response=resp, mimetype="application/json");
 
-
     //Done
-@app.route('/containers/<id>', methods=['GET'])
+  @app.route('/containers/<id>', methods=['GET'])
 def containers_show(id):
     """
     Inspect specific container
@@ -76,8 +75,7 @@ def containers_show(id):
     return Response(response=resp, mimetype="application/json");
 
 
-    //Done
-@app.route('/containers/<id>/logs', methods=['GET'])
+  @app.route('/containers/<id>/logs', methods=['GET'])
 def containers_log(id):
     """
     Dump specific container logs
@@ -89,7 +87,9 @@ def containers_log(id):
     return Response(response=resp, mimetype="application/json");
 
 
-    //Done
+
+
+
 @app.route('/images/<id>', methods=['DELETE'])
 def images_remove(id):
     """
@@ -102,7 +102,6 @@ def images_remove(id):
     return Response(response=resp, mimetype="application/json");
 
 
-    //Done
 @app.route('/containers/<id>', methods=['DELETE'])
 def containers_remove(id):
     """
@@ -116,6 +115,7 @@ def containers_remove(id):
     resp = '{"id": "%s"}' % id;
     return Response(response=resp, mimetype="application/json");
 
+  
 @app.route('/containers', methods=['DELETE'])
 def containers_remove_all():
     """
@@ -149,7 +149,6 @@ def images_remove_all():
         resp = '{"id": "%s"}' % id;
 
     resp = 'All images have been deleted.';
-    return Response(response=resp, mimetype="application/json")
 
 
 @app.route('/containers', methods=['POST'])
@@ -198,6 +197,7 @@ def containers_update(id):
     resp = '{"id": "%s"}' % id;
     return Response(response=resp, mimetype="application/json");
 
+  
 @app.route('/images/<id>', methods=['PATCH'])
 def images_update(id):
     """
@@ -219,11 +219,13 @@ def docker(*args):
     return stderr + stdout
 
 #
+#
 # Docker output parsing helpers
 #
 
 #
 # Parses the output of a Docker PS command to a python List
+#
 #
 def docker_ps_to_array(output):
     all = []
@@ -250,6 +252,7 @@ def docker_logs_to_object(id, output):
 
 #
 # Parses the output of a Docker image command to a python List
+#
 #
 def docker_images_to_array(output):
     all = []
