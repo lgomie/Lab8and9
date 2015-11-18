@@ -105,8 +105,8 @@ def containers_remove(id):
 
     curl -s -X DELETE -H 'Accept: application/json' http://localhost:8080/containers/<id> | python -mjson.tool
     """
-
-    resp = ''
+    docker('rm', id)
+    resp = '{"id": "%s"}' % id
     return Response(response=resp, mimetype="application/json")
 
 @app.route('/containers', methods=['DELETE'])
@@ -115,9 +115,11 @@ def containers_remove_all():
     Force remove all containers - dangerous!
 
     curl -s -X DELETE -H 'Accept: application/json' http://localhost:8080/containers/ | python -mjson.tool
-
     """
-    resp = ''
+    
+
+    
+    resp = 
     return Response(response=resp, mimetype="application/json")
 
 @app.route('/images', methods=['DELETE'])
