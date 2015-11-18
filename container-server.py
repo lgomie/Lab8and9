@@ -62,7 +62,7 @@ def images_index():
     resp = output;
     return Response(response=resp, mimetype="application/json");
 
-  
+
     //Done
   @app.route('/containers/<id>', methods=['GET'])
 def containers_show(id):
@@ -75,7 +75,7 @@ def containers_show(id):
     resp = output;
     return Response(response=resp, mimetype="application/json");
 
-  
+
     //Done
   @app.route('/containers/<id>/logs', methods=['GET'])
 def containers_log(id):
@@ -88,7 +88,7 @@ def containers_log(id):
     resp = json.dumps(docker_logs_to_object(id, output));
     return Response(response=resp, mimetype="application/json");
 
-  
+
     //Done
 @app.route('/images/<id>', methods=['DELETE'])
 def images_remove(id):
@@ -125,7 +125,7 @@ def containers_remove_all():
 
     containers = docker_ps_to_array(docker('ps','-a'));
     output = {};
-    
+
     for i in containers:
         docker('stop', id);
         docker('kill', id);
@@ -145,7 +145,7 @@ def images_remove_all():
     images = docker('images', -q);
     images = images.split ('\n')
 
-    for i in iaages:
+    for i in images:
         docker ('rmi', id);
         resp = '{"id": "%s"}' % id;
 
@@ -198,7 +198,7 @@ def containers_update(id):
     resp = '{"id": "%s"}' % id;
     return Response(response=resp, mimetype="application/json");
 
-  
+
 @app.route('/images/<id>', methods=['PATCH'])
 def images_update(id):
     """
